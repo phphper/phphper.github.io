@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="测试 技术," />
 
 
 
@@ -84,15 +84,19 @@
 
 
 
-<meta name="description" content="有了危机感,所以不断前行">
-<meta property="og:type" content="website">
-<meta property="og:title" content="戎码一生">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="每次更改完 NexT 文档 都要手动部署到 GitHub Pages，重复的次数多了就显得很麻烦，出错的几率也会变大。文档源码放置在 master 分支，最终部署文件在 gh-pages 分支。当在 master 分支更改某些内容之后，通过运行 gulp dist 来生成最终部署的 HTML 文件到 dist 目录，随后再进入 dist 目录初始化 git 仓库、添加文件、提交文件，最后将提交强制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 Travis CI 自动更新 GitHub Pages">
+<meta property="og:url" content="http://yoursite.com/2016/07/14/使用-Travis-CI-自动更新-GitHub-Pages/index.html">
 <meta property="og:site_name" content="戎码一生">
-<meta property="og:description" content="有了危机感,所以不断前行">
+<meta property="og:description" content="每次更改完 NexT 文档 都要手动部署到 GitHub Pages，重复的次数多了就显得很麻烦，出错的几率也会变大。文档源码放置在 master 分支，最终部署文件在 gh-pages 分支。当在 master 分支更改某些内容之后，通过运行 gulp dist 来生成最终部署的 HTML 文件到 dist 目录，随后再进入 dist 目录初始化 git 仓库、添加文件、提交文件，最后将提交强制">
+<meta property="og:image" content="http://yoursite.com/uploads/day-day-poor.jpg">
+<meta property="og:image" content="http://yoursite.com/uploads/publishing-github-pages-with-travis-ci/travis-encrypt-keys.png">
+<meta property="og:updated_time" content="2016-07-14T10:12:45.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="戎码一生">
-<meta name="twitter:description" content="有了危机感,所以不断前行">
+<meta name="twitter:title" content="使用 Travis CI 自动更新 GitHub Pages">
+<meta name="twitter:description" content="每次更改完 NexT 文档 都要手动部署到 GitHub Pages，重复的次数多了就显得很麻烦，出错的几率也会变大。文档源码放置在 master 分支，最终部署文件在 gh-pages 分支。当在 master 分支更改某些内容之后，通过运行 gulp dist 来生成最终部署的 HTML 文件到 dist 目录，随后再进入 dist 目录初始化 git 仓库、添加文件、提交文件，最后将提交强制">
+<meta name="twitter:image" content="http://yoursite.com/uploads/day-day-poor.jpg">
 
 
 
@@ -113,9 +117,9 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2016/07/14/使用-Travis-CI-自动更新-GitHub-Pages/"/>
 
-  <title> 戎码一生 - 有了危机感,所以不断前行 </title>
+  <title> 使用 Travis CI 自动更新 GitHub Pages | 戎码一生 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -146,9 +150,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left 
-   page-home 
- ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -255,9 +257,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
   
@@ -277,10 +279,7 @@
             
             
               
-                
-                <a class="post-title-link" href="/2016/07/14/使用-Travis-CI-自动更新-GitHub-Pages/" itemprop="url">
-                  使用 Travis CI 自动更新 GitHub Pages
-                </a>
+                使用 Travis CI 自动更新 GitHub Pages
               
             
           </h1>
@@ -327,140 +326,84 @@
       
 
       
-        
-          
-            <p>每次更改完 <a href="http://theme-next.iissnan.com" target="_blank" rel="external">NexT 文档</a> 都要手动部署到 GitHub Pages，重复的次数多了就显得很麻烦，出错的几率也会变大。文档源码放置在 master 分支，最终部署文件在 gh-pages 分支。当在 master 分支更改某些内容之后，通过运行 gulp dist 来生成最终部署的 HTML 文件到 dist 目录，随后再进入 dist 目录初始化 git 仓库、添加文件、提交文件，最后将提交强制推送到远程 gh-pages 分支（因当心我会误将最终部署的 HTML 文件提交到 master 分支导致源码丢失，我在 GitHub 上把 master 分支给锁定了）。除此之外还有另外一个问题：如果 master 分支有 Pull Requests，我需要先将更新取回本地，然后编译更新再提交回远程 gh-pages 分支。</p><br><h2 id="年轻的想法">年轻的想法</h2><p>于是，我就想这说将这个过程自动化。首先考虑了使用 <a href="https://developer.github.com/webhooks/" target="_blank" rel="external">GitHub Webhooks</a>，这是 Github 提供的一种机制，使应用能与 Github 通讯。这种机制实际上就是 Pub/Sub，当 Github 监测到资源（如仓库）有变化就往预先设定的 URL 发送一个 POST 请求（Pub），告知变化情况，而后接收变化的服务器（Sub）即可做一些额外的事情。</p><br><p>这个思路需要有一个服务器并启动一个服务来接收 Github 的请求。这里又有种不同的策略，这两种策略都是基于源码放置在 Github 的前提。第一个是源码将最终文档直接部署在这台服务器上（如使用 Nginx），当接收到 Github 通知直接编译更新到服务器指定的文件夹下即可。另一种策略是当服务器接收到通知后编译更新，而后将编译后的版本提交到 Github 仓库的 gh-pages 分支，让 Github 做 Host。</p><br><a id="more"></a><br><h2 id="Travis_CI_登场">Travis CI 登场</h2><p>由于比较穷，租不起服务器（果然有点年轻），于是就想说有没有免费的方案可以用。于是就惦记起各种 CI 服务，本着够用就好少折腾的原则直接选了 <a href="https://travis-ci.org/" target="_blank" rel="external">Travis CI</a>，对外宣称是免费的还要求那么多不是太合适，其实本质是读英文文档嫌累π_π。没有折腾精神的开发不是一个好开发，这能怪我么，好吧，确实是我的错，我太穷了。</p><br><p><img src="/uploads/day-day-poor.jpg" alt="Poor Guy"></p><br><p>那么，终归是找到了解决方案。有了持续构建系统，就可以做到有更新自动 Build，意味着就可以多看两集韩国噢八剧，一集英国基情剧，N 集日本爱情剧以及英雄联盟。那么预想的整个流程就是 ：</p><br><ul><br><li>更新代码到 Github</li><br><li>Github 跑去告诉 Travis CI 说有个东西变了</li><br><li>Travis CI 勃然大怒、立马安排 Build</li><br><li>Travis CI build 成功后，将输出丢到 Github gh-pages 分支</li><br><li>Github build Pages</li><br><li>领盒饭收工</li><br></ul><br><p>非常 Easy，哪里不会去 Google！</p><br><h2 id="那些年的那些坑">那些年的那些坑</h2><p>接下来就是实际动手了。注册 Travis CI，Github 集成 Travis CI ，Travis CI 为特定的仓库变动自动 Build 这些事情就是像个 Boss 一样点点鼠标就行了。问题就在于最后一步，怎么让 Travis CI 往 Github 提交代码呢？将 Github 帐号信息写在 <code>.travis.yml</code> 文件里毕竟是一个太过年轻的做法。然后我找到了 <a href="https://github.com/tommy351" target="_blank" rel="external">Hexo 作者 SkyArrow</a>的<a href="https://zespia.tw/blog/2015/01/21/continuous-deployment-to-github-with-travis/" target="_blank" rel="external">这篇文章</a>，通篇看下来，我长嘘了一口气在想要不就老老实实手动编译更新吧。然而，就在我长嘘短叹人生之艰难的时候，突然发现 Travis CI 除了支持 <a href="https://docs.travis-ci.com/user/encrypting-files/" target="_blank" rel="external">加密文件</a> 也支持 <a href="https://docs.travis-ci.com/user/encryption-keys/" target="_blank" rel="external">加密 Token Key</a>。于是，事情有了转机。</p><br><h2 id="另一种方案">另一种方案</h2><p>这种方案不再使用 RSA 加密算法去生成一对密钥，取而代之的是 Github 提供的 <a href="https://github.com/blog/1509-personal-api-tokens" target="_blank" rel="external">Personal Access Token</a>。这个 Token 与 帐号密码 以及 SSH Keys 同样具有 Github 写入能力，因此只要使用 Travis CI 提供的加密工具来加密这个 Token 即可。</p><br><h3 id="方案原理">方案原理</h3><p>根据 <a href="(https://docs.travis-ci.com/user/encryption-keys/">Travis CI 的文档</a>，他会使用一对 Key Pair 中的 Public Key 来加密你提供的 Token 得到一个 Secure Token（这个 Secure Token 可以安全地放置在 <code>.travis.yml</code> 中），而在 Build 的时候他会使用 Private Key 来解密这个 Secure Token 获取最初提供的 Github Personal Access Token，见下图：</p><br><p><img src="/uploads/publishing-github-pages-with-travis-ci/travis-encrypt-keys.png" alt="Travis CI - Encrypt Keys"></p><br><h3 id="具体操作">具体操作</h3><p>了解了背后的原理就可以大胆地去着手实现。按照原理来讲，大致需要三个步骤，第一获取 GitHub Personal Access Token；第二使用 Travis CI 的工具加密这个 Token，并保存到 <code>.travis.yml</code> 文件中；第三配置文件使用 Access Token。具体的操作步骤如下：</p><br><ol><br><li><p>生成一个 Github Personal Access Token。前往 Github 帐号 Settings 页面，在左侧选择 Personal Access Token，然后在右侧面板点击 “Generate new token” 来新建一个 Token。需要注意的是，创建完的 Token 只有第一次可见，之后再访问就无法看见（只能看见他的名称），因此要保存好这个值。</p><br></li><br><li><p>使用 Travis CI 的 <a href="https://github.com/travis-ci/travis.rb#readme" target="_blank" rel="external">命令行工具</a> 加密 GitHub 的 Personal Access Token。这个工具是一个 gem 包，因此需要 Ruby 环境。假设已经安装好 Ruby 环境，即可安装 Travis CI 的命令行工具，以及加密：</p><br><pre><code># 安装 Travis CI 命令行工具<br>gem <span class="operator"><span class="keyword">install</span> travis<br><br># 加密 Personal <span class="keyword">Access</span> Token<br>travis <span class="keyword">encrypt</span> -r iissnan/theme-<span class="keyword">next</span>-docs GH_Token=XXX</span><br></code></pre><p> 第二条命令中 <code>-r</code> 后的参数是 GitHub 仓库的名字（&lt;用户名&gt;/&lt;仓库名&gt;）；<code>GH_TOKEN</code> 将作为环境变量使用。将这条命令输出的结果复制到 <code>.travis.yml</code> 文件下：</p><br><pre><code><span class="string">env:</span><br><span class="label">  global:</span><br>    - <span class="string">GH_REF:</span> github.com<span class="regexp">/iissnan/</span>theme-next-docs.git<br>    - <span class="string">secure:</span> <span class="string">“XXXXXX”</span><br></code></pre><p> 这个设置之中包含了 仓库的地址（设置在 <code>GH_REF</code> 环境变量中）以及 Access Token （被加密了，设置在 <code>GH_TOKEN</code> 环境变量中）。这两个环境变量将 Build 的时候被使用，用于往 GitHub <code>gh-pages</code> 分支推送。</p><br></li><br><li><p>让 Travis CI 往 Github 仓库的 gh-pages 分支提交。根据需求的不同，这里的配置也不尽相同，但重要的是如何使用 <code>GH_REF 和 GH_TOKEN</code> 这两个环境变量。NexT 文档是执行 <code>gulp dist</code> 来生成最终的 HTML文件，然后推送到 GitHub Pages，其配置如下：</p><br><pre><code># S: Build Lifecycle<br>install:<br>  -<span class="ruby"> npm install<br></span><br>before_script:<br>  -<span class="ruby"> npm install -g gulp<br></span><br>script:<br>  -<span class="ruby"> gulp dist<br></span><br>after_script:<br>  -<span class="ruby"> cd dist<br></span>  -<span class="ruby"> git init<br></span>  -<span class="ruby"> git config user.name <span class="string">“iissnan”</span><br></span>  -<span class="ruby"> git config user.email <span class="string">“email_address”</span><br></span>  -<span class="ruby"> git add .<br></span>  -<span class="ruby"> git commit -m <span class="string">“Update docs”</span><br></span>  -<span class="ruby"> git push -f <span class="string">“<a href="https://${GH_TOKEN}@${GH_REF}" target="_blank" rel="external">https://${GH_TOKEN}@${GH_REF}</a>“</span> <span class="symbol">master:</span>gh-pages<br></span># E: Build LifeCycle<br></code></pre></li><br></ol><br><p>到此，整个流程就结束了。NexT 文档使用的配置在 <a href="https://github.com/iissnan/theme-next-docs/blob/master/.travis.yml" target="_blank" rel="external">这里</a>，有需要的可以参考下。</p>
+        <p>每次更改完 <a href="http://theme-next.iissnan.com" target="_blank" rel="external">NexT 文档</a> 都要手动部署到 GitHub Pages，重复的次数多了就显得很麻烦，出错的几率也会变大。文档源码放置在 master 分支，最终部署文件在 gh-pages 分支。当在 master 分支更改某些内容之后，通过运行 gulp dist 来生成最终部署的 HTML 文件到 dist 目录，随后再进入 dist 目录初始化 git 仓库、添加文件、提交文件，最后将提交强制推送到远程 gh-pages 分支（因当心我会误将最终部署的 HTML 文件提交到 master 分支导致源码丢失，我在 GitHub 上把 master 分支给锁定了）。除此之外还有另外一个问题：如果 master 分支有 Pull Requests，我需要先将更新取回本地，然后编译更新再提交回远程 gh-pages 分支。</p><br><h2 id="年轻的想法">年轻的想法</h2><p>于是，我就想这说将这个过程自动化。首先考虑了使用 <a href="https://developer.github.com/webhooks/" target="_blank" rel="external">GitHub Webhooks</a>，这是 Github 提供的一种机制，使应用能与 Github 通讯。这种机制实际上就是 Pub/Sub，当 Github 监测到资源（如仓库）有变化就往预先设定的 URL 发送一个 POST 请求（Pub），告知变化情况，而后接收变化的服务器（Sub）即可做一些额外的事情。</p><br><p>这个思路需要有一个服务器并启动一个服务来接收 Github 的请求。这里又有种不同的策略，这两种策略都是基于源码放置在 Github 的前提。第一个是源码将最终文档直接部署在这台服务器上（如使用 Nginx），当接收到 Github 通知直接编译更新到服务器指定的文件夹下即可。另一种策略是当服务器接收到通知后编译更新，而后将编译后的版本提交到 Github 仓库的 gh-pages 分支，让 Github 做 Host。</p><br><a id="more"></a><br><h2 id="Travis_CI_登场">Travis CI 登场</h2><p>由于比较穷，租不起服务器（果然有点年轻），于是就想说有没有免费的方案可以用。于是就惦记起各种 CI 服务，本着够用就好少折腾的原则直接选了 <a href="https://travis-ci.org/" target="_blank" rel="external">Travis CI</a>，对外宣称是免费的还要求那么多不是太合适，其实本质是读英文文档嫌累π_π。没有折腾精神的开发不是一个好开发，这能怪我么，好吧，确实是我的错，我太穷了。</p><br><p><img src="/uploads/day-day-poor.jpg" alt="Poor Guy"></p><br><p>那么，终归是找到了解决方案。有了持续构建系统，就可以做到有更新自动 Build，意味着就可以多看两集韩国噢八剧，一集英国基情剧，N 集日本爱情剧以及英雄联盟。那么预想的整个流程就是 ：</p><br><ul><br><li>更新代码到 Github</li><br><li>Github 跑去告诉 Travis CI 说有个东西变了</li><br><li>Travis CI 勃然大怒、立马安排 Build</li><br><li>Travis CI build 成功后，将输出丢到 Github gh-pages 分支</li><br><li>Github build Pages</li><br><li>领盒饭收工</li><br></ul><br><p>非常 Easy，哪里不会去 Google！</p><br><h2 id="那些年的那些坑">那些年的那些坑</h2><p>接下来就是实际动手了。注册 Travis CI，Github 集成 Travis CI ，Travis CI 为特定的仓库变动自动 Build 这些事情就是像个 Boss 一样点点鼠标就行了。问题就在于最后一步，怎么让 Travis CI 往 Github 提交代码呢？将 Github 帐号信息写在 <code>.travis.yml</code> 文件里毕竟是一个太过年轻的做法。然后我找到了 <a href="https://github.com/tommy351" target="_blank" rel="external">Hexo 作者 SkyArrow</a>的<a href="https://zespia.tw/blog/2015/01/21/continuous-deployment-to-github-with-travis/" target="_blank" rel="external">这篇文章</a>，通篇看下来，我长嘘了一口气在想要不就老老实实手动编译更新吧。然而，就在我长嘘短叹人生之艰难的时候，突然发现 Travis CI 除了支持 <a href="https://docs.travis-ci.com/user/encrypting-files/" target="_blank" rel="external">加密文件</a> 也支持 <a href="https://docs.travis-ci.com/user/encryption-keys/" target="_blank" rel="external">加密 Token Key</a>。于是，事情有了转机。</p><br><h2 id="另一种方案">另一种方案</h2><p>这种方案不再使用 RSA 加密算法去生成一对密钥，取而代之的是 Github 提供的 <a href="https://github.com/blog/1509-personal-api-tokens" target="_blank" rel="external">Personal Access Token</a>。这个 Token 与 帐号密码 以及 SSH Keys 同样具有 Github 写入能力，因此只要使用 Travis CI 提供的加密工具来加密这个 Token 即可。</p><br><h3 id="方案原理">方案原理</h3><p>根据 <a href="(https://docs.travis-ci.com/user/encryption-keys/">Travis CI 的文档</a>，他会使用一对 Key Pair 中的 Public Key 来加密你提供的 Token 得到一个 Secure Token（这个 Secure Token 可以安全地放置在 <code>.travis.yml</code> 中），而在 Build 的时候他会使用 Private Key 来解密这个 Secure Token 获取最初提供的 Github Personal Access Token，见下图：</p><br><p><img src="/uploads/publishing-github-pages-with-travis-ci/travis-encrypt-keys.png" alt="Travis CI - Encrypt Keys"></p><br><h3 id="具体操作">具体操作</h3><p>了解了背后的原理就可以大胆地去着手实现。按照原理来讲，大致需要三个步骤，第一获取 GitHub Personal Access Token；第二使用 Travis CI 的工具加密这个 Token，并保存到 <code>.travis.yml</code> 文件中；第三配置文件使用 Access Token。具体的操作步骤如下：</p><br><ol><br><li><p>生成一个 Github Personal Access Token。前往 Github 帐号 Settings 页面，在左侧选择 Personal Access Token，然后在右侧面板点击 “Generate new token” 来新建一个 Token。需要注意的是，创建完的 Token 只有第一次可见，之后再访问就无法看见（只能看见他的名称），因此要保存好这个值。</p><br></li><br><li><p>使用 Travis CI 的 <a href="https://github.com/travis-ci/travis.rb#readme" target="_blank" rel="external">命令行工具</a> 加密 GitHub 的 Personal Access Token。这个工具是一个 gem 包，因此需要 Ruby 环境。假设已经安装好 Ruby 环境，即可安装 Travis CI 的命令行工具，以及加密：</p><br><pre><code># 安装 Travis CI 命令行工具<br>gem <span class="operator"><span class="keyword">install</span> travis<br><br># 加密 Personal <span class="keyword">Access</span> Token<br>travis <span class="keyword">encrypt</span> -r iissnan/theme-<span class="keyword">next</span>-docs GH_Token=XXX</span><br></code></pre><p> 第二条命令中 <code>-r</code> 后的参数是 GitHub 仓库的名字（&lt;用户名&gt;/&lt;仓库名&gt;）；<code>GH_TOKEN</code> 将作为环境变量使用。将这条命令输出的结果复制到 <code>.travis.yml</code> 文件下：</p><br><pre><code><span class="string">env:</span><br><span class="label">  global:</span><br>    - <span class="string">GH_REF:</span> github.com<span class="regexp">/iissnan/</span>theme-next-docs.git<br>    - <span class="string">secure:</span> <span class="string">“XXXXXX”</span><br></code></pre><p> 这个设置之中包含了 仓库的地址（设置在 <code>GH_REF</code> 环境变量中）以及 Access Token （被加密了，设置在 <code>GH_TOKEN</code> 环境变量中）。这两个环境变量将 Build 的时候被使用，用于往 GitHub <code>gh-pages</code> 分支推送。</p><br></li><br><li><p>让 Travis CI 往 Github 仓库的 gh-pages 分支提交。根据需求的不同，这里的配置也不尽相同，但重要的是如何使用 <code>GH_REF 和 GH_TOKEN</code> 这两个环境变量。NexT 文档是执行 <code>gulp dist</code> 来生成最终的 HTML文件，然后推送到 GitHub Pages，其配置如下：</p><br><pre><code># S: Build Lifecycle<br>install:<br>  -<span class="ruby"> npm install<br></span><br>before_script:<br>  -<span class="ruby"> npm install -g gulp<br></span><br>script:<br>  -<span class="ruby"> gulp dist<br></span><br>after_script:<br>  -<span class="ruby"> cd dist<br></span>  -<span class="ruby"> git init<br></span>  -<span class="ruby"> git config user.name <span class="string">“iissnan”</span><br></span>  -<span class="ruby"> git config user.email <span class="string">“email_address”</span><br></span>  -<span class="ruby"> git add .<br></span>  -<span class="ruby"> git commit -m <span class="string">“Update docs”</span><br></span>  -<span class="ruby"> git push -f <span class="string">“<a href="https://${GH_TOKEN}@${GH_REF}" target="_blank" rel="external">https://${GH_TOKEN}@${GH_REF}</a>“</span> <span class="symbol">master:</span>gh-pages<br></span># E: Build LifeCycle<br></code></pre></li><br></ol><br><p>到此，整个流程就结束了。NexT 文档使用的配置在 <a href="https://github.com/iissnan/theme-next-docs/blob/master/.travis.yml" target="_blank" rel="external">这里</a>，有需要的可以参考下。</p>
 
-          
-        
       
     </div>
 
     <div>
       
+        
+
+      
     </div>
 
     <div>
+      
+        
+
       
     </div>
 
     <footer class="post-footer">
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/07/14/ze/" itemprop="url">
-                  ze
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-14T10:34:00+08:00" content="2016-07-14">
-              2016-07-14
-            </time>
-          </span>
-
+        <div class="post-tags">
           
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/07/14/ze/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/07/14/ze/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
+            <a href="/tags/测试-技术/" rel="tag">#测试 技术</a>
           
         </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-          
-        
-      
-    </div>
+              <a href="/2016/07/14/ze/" rel="next" title="ze">
+                <i class="fa fa-chevron-left"></i> ze
+              </a>
+            
+          </div>
 
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
       
 
       
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
 
 
           </div>
@@ -468,6 +411,14 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/07/14/使用-Travis-CI-自动更新-GitHub-Pages/"
+           data-title="使用 Travis CI 自动更新 GitHub Pages" data-url="http://yoursite.com/2016/07/14/使用-Travis-CI-自动更新-GitHub-Pages/">
+      </div>
+    
+  </div>
+
 
         </div>
         
@@ -487,8 +438,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.png"
@@ -531,6 +491,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#年轻的想法"><span class="nav-number">1.</span> <span class="nav-text">年轻的想法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Travis_CI_登场"><span class="nav-number">2.</span> <span class="nav-text">Travis CI 登场</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#那些年的那些坑"><span class="nav-number">3.</span> <span class="nav-text">那些年的那些坑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#另一种方案"><span class="nav-number">4.</span> <span class="nav-text">另一种方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#方案原理"><span class="nav-number">4.1.</span> <span class="nav-text">方案原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#具体操作"><span class="nav-number">4.2.</span> <span class="nav-text">具体操作</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
       
 
     </div>
@@ -629,6 +600,10 @@ cnzz_tongji: true
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 
