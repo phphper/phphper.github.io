@@ -1549,7 +1549,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #cf74be;
+  background: #61754f;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -2133,8 +2133,8 @@ a.search-result {
 .page-post-detail .comments {
   overflow: hidden;
 }
-#body {
-  background: url("/images/background.jpg") no-repeat 100%;
+body {
+  background: url("http://oab3kr3oh.bkt.clouddn.com/bg.jpeg");
 }
 #body {
   background: #f5f7f9;
