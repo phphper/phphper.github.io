@@ -337,39 +337,15 @@
 
       
         
-          
-            <p></p><h4> 关于MAC上配置PHP环境</h4><p></p>
+          <p><h4> 关于MAC上配置PHP环境</h4></p>
 <ol>
-<li>首先下载MAMP集成环境安装包,可以通过官网www.mamp.info [下载] 或者在百度搜索进行下载<br><br><em>关于MAMP和MAMP PRO 的区别在于MAMP是免费版PRO是收费版,免费版只支持php5.6 和 php7.0 两个版本 POR版本可以随意切换php版本 PRO版本的功能比较多 请自行选择</em></li>
-<li>本章采用MAMP 3.5 进行配置,下载好安装包后进行安装 <br> <img src="http://oab3kr3oh.bkt.clouddn.com/1.png" alt="image"></li>
-<li>安装过程非常简单,一路确定.完成后打开软件.出现下面界面,选择第一个免费版.<br><img src="http://oab3kr3oh.bkt.clouddn.com/2.png" alt="image"></li>
-<li>然后点击start/stop 启动服务, 两个绿灯亮起说明你的环境配置成功了!<br><img src="http://oab3kr3oh.bkt.clouddn.com/4.png" alt="image"></li>
-<li>点击设置,进行端口设置.<br><img src="http://oab3kr3oh.bkt.clouddn.com/5.png" alt="image"></li>
-<li>到现在你的环境就搭建完成了.😊</li>
-<li>回到之前窗口,点击    Open start page .会看到下面的页面<br><img src="http://oab3kr3oh.bkt.clouddn.com/3.png" alt="image"></li>
-<li>上面的页面中可以在导航栏中打开phpinfo 和 phpmyadmin</li>
-<li><strong>关于web文件的存储位置: MAMP环境下的web目录为/Application/MAMP/htdocs/</strong></li>
-<li><strong>apache的配置路径/Application/MAMP/conf/apache/http.conf</strong></li>
-<li><strong>虚拟主机的配置方法: 首先要打开/Application/MAMP/conf/apache/http.conf</strong><br>找到并打开<br><code># Virtual hosts
-Include /Applications/MAMP/conf/apache/extra/httpd-vhosts.conf</code> </li>
-<li>接着进入/Application/MAMP/conf/apache/extra/httpd-vhosts.conf<br><code>&lt;VirtualHost *:80&gt;
-ServerAdmin example@host.com    //主机地址
-DocumentRoot /Users/UserName/Documents/Project/admin  //工程目录
-ServerName  local.example.com   //虚拟的域名
-ErrorLog &quot;logs/a.ifenxi.com-error.log&quot;    //运行时的错误日志存放地址
-CustomLog &quot;logs/a.ifenxi.com_cus.log&quot; combined 
-&lt;Directory &quot;/Users/UserName/Documents/Project/admin&quot;&gt;
-  Options FollowSymLinks
-  AllowOverride All
-  Order allow,deny
-  allow from all
-&lt;/Directory&gt;
-&lt;/VirtualHost&gt;</code><br><strong>配置完后保存重启服务</strong></li>
-<li>运行sudo vi /etc/hosts <br>(sudo 命令是开启管理员模式的命令,一般需要输入密码,否则不能修改hosts文件,还有一种方法是将文件移动到桌面修改后替换原文件,请自行选择.)<br>配置host文件，在IP列表中添加一行<br><code>127.0.0.1           local.example.com（刚才配置的域名）</code><br><strong>wq保存退出</strong><br><del>好了,虚拟主机就配置完成了</del></li>
-<li><strong>关于基于MAMP环境配置memcache 和 redis 下一章进行详述.</strong></li>
-</ol>
-
-          
+<li>首先下载MAMP集成环境安装包,可以通过官网www.mamp.info [下载] 或者在百度搜索进行下载<br/><br><em>关于MAMP和MAMP PRO 的区别在于MAMP是免费版PRO是收费版,免费版只支持php5.6 和 php7.0 两个版本 POR版本可以随意切换php版本 PRO版本的功能比较多 请自行选择</em></li>
+<li>本章采用MAMP 3.5 进行配置,下载好安装包后进行安装 <br/> <img src="http://oab3kr3oh.bkt.clouddn.com/1.png" alt="image">
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/07/19/MAC下搭建php环境/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
